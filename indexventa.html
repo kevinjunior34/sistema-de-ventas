@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrar Venta</title>
+  <style>
+    /* --- Tu CSS igual que antes --- */
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url(https://fondosmil.co/fondo/17010.jpg);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgb(0, 0, 0);
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+    }
+    nav a {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.46);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    nav a:hover {
+      background-color: rgb(34, 81, 128);
+    }
+    h2 {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .main-content {
+      display: flex;
+      max-width: 1200px;
+      margin: 90px auto 40px;
+      gap: 40px;
+      padding: 0 20px;
+      box-sizing: border-box;
+      align-items: flex-start;
+    }
+    .container {
+      flex: 1 1 380px;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 35px;
+      border-radius: 15px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-width: 480px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    label {
+      font-weight: 600;
+      text-align: left;
+    }
+    select, input[type=number] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+    select:focus, input[type=number]:focus {
+      border-color: #007bff;
+    }
+    button.agregar {
+      align-self: flex-start;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 8px;
+      transition: background-color 0.3s ease;
+    }
+    button.agregar:hover {
+      background-color: #0056b3;
+    }
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .actions button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      color: white;
+    }
+    #btnVender {
+      background-color: #28a745;
+    }
+    #btnVender:hover {
+      background-color: #218838;
+    }
+    #btnCancelar {
+      background-color: #dc3545;
+    }
+    #btnCancelar:hover {
+      background-color: #c82333;
+    }
+    #tabla-venta {
+      flex: 1 1 auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #tabla-venta thead {
+      background-color: #004080;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #tabla-venta thead th {
+      padding: 12px 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    #tabla-venta tbody td {
+      padding: 12px 15px;
+      text-align: center;
+      font-size: 14px;
+      border-bottom: 1px solid #ddd;
+    }
+    #tabla-venta tbody tr:hover {
+      background-color: #e6f0ff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #tabla-venta tbody tr:last-child td {
+      border-bottom: none;
+    }
+    #tabla-venta tfoot td {
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 15px;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    @media (max-width: 900px) {
+      .main-content {
+        flex-direction: column;
+        margin: 90px 15px 40px;
+      }
+      #tabla-venta {
+        max-height: none;
+        display: table;
+      }
+      .container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="menu_admin.php">volver</a>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="container">
+      <h2>Registrar Venta</h2>
+
+      <form onsubmit="event.preventDefault(); agregarProducto();">
+        <label for="cliente">Cliente:</label>
+        <select id="cliente" required>
+          <option value="">Seleccione un cliente</option>
+        </select>
+
+        <hr style="margin: 20px 0;" />
+
+        <label for="producto">Producto:</label>
+        <select id="producto">
+          <option value="">Seleccione un producto</option>
+        </select>
+
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" placeholder="Cantidad" min="1" value="1" />
+
+        <button type="submit" class="agregar">Agregar</button>
+      </form>
+
+      <div class="actions">
+        <button id="btnVender" onclick="vender()">Vender</button>
+        <button id="btnCancelar" onclick="cancelar()">Cancelar</button>
+      </div>
+    </div>
+
+    <table id="tabla-venta">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">Total</td>
+          <td id="total">0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+<script>
+  let clienteBloqueado = false;
+  let productos = [];
+  let carrito = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetch("clientes.php")
+      .then(res => res.json())
+      .then(data => {
+        const selectCliente = document.getElementById("cliente");
+        data.forEach(cliente => {
+          selectCliente.innerHTML += `<option value="${cliente.id_cliente}">${cliente.nombre}</option>`;
+        });
+      });
+
+    fetch("productos.php")
+      .then(res => res.json())
+      .then(data => {
+        productos = data;
+        const selectProducto = document.getElementById("producto");
+        data.forEach(producto => {
+          selectProducto.innerHTML += `<option value="${producto.id_producto}">${producto.descripcion}</option>`;
+        });
+      });
+
+    document.getElementById("cliente").addEventListener("change", () => {
+      if (!clienteBloqueado && document.getElementById("cliente").value !== "") {
+        document.getElementById("cliente").disabled = true;
+        clienteBloqueado = true;
+      }
+    });
+  });
+
+  function agregarProducto() {
+    const idProducto = document.getElementById("producto").value;
+    const cantidad = parseInt(document.getElementById("cantidad").value);
+    if (!idProducto || cantidad <= 0 || isNaN(cantidad)) return alert("Seleccione un producto y una cantidad válida.");
+    const prod = productos.find(p => p.id_producto == idProducto);
+    const index = carrito.findIndex(item => item.id_producto == idProducto);
+    if (index >= 0) {
+      carrito[index].cantidad += cantidad;
+    } else {
+      carrito.push({
+        id_producto: prod.id_producto,
+        descripcion: prod.descripcion,
+        precio: parseFloat(prod.precio),
+        cantidad: cantidad
+      });
+    }
+    actualizarTabla();
+  }
+
+  function actualizarTabla() {
+    const tbody = document.querySelector("#tabla-venta tbody");
+    tbody.innerHTML = "";
+    let total = 0;
+    carrito.forEach((item, i) => {
+      const subtotal = item.precio * item.cantidad;
+      total += subtotal;
+      tbody.innerHTML += `
+        <tr>
+          <td>${item.descripcion}</td>
+          <td>${item.precio.toFixed(2)}</td>
+          <td>${item.cantidad}</td>
+          <td>${subtotal.toFixed(2)}</td>
+          <td><button onclick="eliminarProducto(${i})" style="background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;">Eliminar</button></td>
+        </tr>`;
+    });
+    document.getElementById("total").textContent = total.toFixed(2);
+  }
+
+  function eliminarProducto(index) {
+    carrito.splice(index, 1);
+    actualizarTabla();
+  }
+
+  function vender() {
+    const idCliente = document.getElementById("cliente").value;
+
+    if (!carrito.length || !idCliente) {
+      alert("Debe seleccionar un cliente y agregar productos.");
+      return;
+    }
+
+    const ventaData = {
+      id_cliente: idCliente,
+      detalles: carrito.map(item => ({
+        id_producto: item.id_producto,
+        cantidad: item.cantidad
+      }))
+    };
+
+    fetch("guardar_venta.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(ventaData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(`Venta registrada con éxito. ID: ${data.id_venta}`);
+        // Llama a generarBoleta para abrir PDF con datos actuales
+        generarBoleta();
+        cancelar();
+      } else {
+        alert("Error al registrar la venta: " + data.error);
+      }
+    })
+    .catch(error => {
+      console.error("Error al enviar la venta:", error);
+      alert("Ocurrió un error al procesar la venta.");
+    });
+  }
+function generarBoleta() {
+  const clienteSeleccionado = document.getElementById('cliente');
+  const clienteNombre = clienteSeleccionado.options[clienteSeleccionado.selectedIndex].text;
+
+  // Enviar carrito con descripcion y precio
+  fetch('boleta.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      cliente: clienteNombre,
+      detalles: carrito
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Error en respuesta del servidor");
+    return res.blob();
+  })
+  .then(blob => {
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  })
+  .catch(error => {
+    alert("Error al generar la boleta: " + error.message);
+    console.error(error);
+  });
+}
+
+
+  function cancelar() {
+    carrito = [];
+    actualizarTabla();
+    document.getElementById("cliente").disabled = false;
+    document.getElementById("cliente").value = "";
+    clienteBloqueado = false;
+    document.getElementById("producto").value = "";
+    document.getElementById("cantidad").value = 1;
+  }
+</script>
+</body>
+</html>

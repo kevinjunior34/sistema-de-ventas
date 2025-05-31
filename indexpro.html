@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD Proveedores</title>
+  <style>
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url(https://fondosmil.co/fondo/17010.jpg);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgb(0, 0, 0);
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    nav a {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.46);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: rgb(34, 81, 128);
+    }
+
+    h1 {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      text-align: center;
+      margin-top: 70px; /* Espacio para el header */
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: rgba(255, 255, 255, 0.521);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #cccccc62;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .proveedor {
+      border: 1px solid #ccc;
+      background-color: #ffffff3b;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      text-align: left;
+    }
+
+    .proveedor button {
+      margin-left: 10px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    .proveedor button:first-of-type {
+      background-color: #28a745; /* Verde para Editar */
+    }
+
+    .proveedor button:first-of-type:hover {
+      background-color: #218838; /* Verde más oscuro al pasar el mouse */
+    }
+
+    .proveedor button:last-of-type {
+      background-color: #dc3545; /* Rojo para Eliminar */
+    }
+
+    .proveedor button:last-of-type:hover {
+      background-color: #c82333; /* Rojo más oscuro al pasar el mouse */
+    }
+
+    .alerta {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 15px 20px;
+      font-weight: bold;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      font-size: 16px;
+      display: none;
+    }
+
+    .alerta.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alerta.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Clientes</a>
+      <a href="indexproducto.html">Producto</a>
+      <a href="indextcat.html">Categorías</a>
+      <a href="ventas.html">Ventas</a>
+      <a href="detalle_venta.html">Detalle_venta</a>
+      <a href="menu_admin.php">volver</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>CRUD Proveedores</h1>
+    <div id="alerta" class="alerta"></div>
+    <form id="formProveedor" onsubmit="return validatePhoneNumber();">
+      <input type="hidden" id="id_proveedor" />
+      <input type="text" id="razonsocial" placeholder="Razón Social" required />
+      <input type="text" id="direccion" placeholder="Dirección" />
+      <input type="text" id="telefono" placeholder="Teléfono" required pattern="^9\d{8}$" title="El teléfono debe empezar con 9 y tener 9 dígitos." />
+      <button type="submit">Guardar</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <h3>Lista de Proveedores</h3>
+    <div id="proveedores"></div>
+  </div>
+
+  <script>
+    function mostrarAlerta(mensaje, tipo = 'success') {
+      const alerta = document.getElementById('alerta');
+      alerta.textContent = mensaje;
+      alerta.className = `alerta ${tipo}`;
+      alerta.style.display = 'block';
+      setTimeout(() => alerta.style.display = 'none', 3000);
+    }
+
+    async function cargarProveedores() {
+      try {
+        const res = await fetch('listarpro.php');
+        const data = await res.json();
+        const contenedor = document.getElementById('proveedores');
+        contenedor.innerHTML = '';
+        data.forEach(p => {
+          contenedor.innerHTML += `
+            <div class="proveedor">
+              <strong>${p.razonsocial}</strong> - ${p.direccion} - ${p.telefono}
+              <button onclick="editar(${p.id_proveedor})">Editar</button>
+              <button onclick="eliminar(${p.id_proveedor})">Eliminar</button>
+            </div>
+          `;
+        });
+      } catch {
+        mostrarAlerta('Error al cargar proveedores.', 'error');
+      }
+    }
+
+    document.getElementById('formProveedor').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const id = document.getElementById('id_proveedor').value;
+      const razonsocial = document.getElementById('razonsocial').value.trim();
+      const direccion = document.getElementById('direccion').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+
+      if (!razonsocial) {
+        mostrarAlerta('La razón social es obligatoria.', 'error');
+        return;
+      }
+
+      const datos = new FormData();
+      datos.append('razonsocial', razonsocial);
+      datos.append('direccion', direccion);
+      datos.append('telefono', telefono);
+
+      let url = 'crearpro.php';
+      let accion = 'creado';
+
+      if (id) {
+        datos.append('id_proveedor', id);
+        url = 'actualizarpro.php';
+        accion = 'actualizado';
+      }
+
+      try {
+        const res = await fetch(url, { method: 'POST', body: datos });
+        const texto = await res.text();
+
+        if (res.ok) {
+          mostrarAlerta(`Proveedor ${accion} correctamente.`);
+          e.target.reset();
+          document.getElementById('id_proveedor').value = '';
+          cargarProveedores();
+        } else {
+          mostrarAlerta(texto || `Error al ${accion} proveedor.`, 'error');
+        }
+      } catch {
+        mostrarAlerta(`Error al ${accion} proveedor.`, 'error');
+      }
+    });
+
+    async function editar(id) {
+      try {
+        const res = await fetch('obtenerpro.php?id=' + id);
+        const p = await res.json();
+        if (p.error) {
+          mostrarAlerta(p.error, 'error');
+          return;
+        }
+        document.getElementById('id_proveedor').value = p.id_proveedor;
+        document.getElementById('razonsocial').value = p.razonsocial;
+        document.getElementById('direccion').value = p.direccion;
+        document.getElementById('telefono').value = p.telefono;
+      } catch {
+        mostrarAlerta('Error al obtener proveedor.', 'error');
+      }
+    }
+
+    async function eliminar(id) {
+      if (confirm("¿Seguro que quieres eliminar este proveedor?")) {
+        try {
+          const res = await fetch('eliminarpro.php?id=' + id);
+          if (res.ok) {
+            mostrarAlerta('Proveedor eliminado correctamente.');
+            cargarProveedores();
+          } else {
+            throw new Error();
+          }
+        } catch {
+          mostrarAlerta('Error al eliminar proveedor.', 'error');
+        }
+      }
+    }
+
+    // Cargar lista al iniciar
+    cargarProveedores();
+  </script>
+</body>
+</html>

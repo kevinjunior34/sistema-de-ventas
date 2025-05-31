@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD Productos</title>
+  <style>
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url(https://fondosmil.co/fondo/17010.jpg);
+      background-size: cover;
+      background-repeat: no-repeat;
+      justify-content: center;
+      background-position: center;
+      align-items: center;
+      background-attachment: fixed;
+    }
+
+    /* Header y navegación */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgb(0, 0, 0);
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    select {
+      width: 220px;
+      padding: 10px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    select:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    nav a {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.46);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: rgb(34, 81, 128);
+    }
+
+    h1 {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    form, .producto {
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .producto {
+      border: 1px solid #ccc;
+      background-color: #ffffff62;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .alerta {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 15px 20px;
+      font-weight: bold;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      font-size: 16px;
+      display: none;
+    }
+
+    .alerta.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alerta.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      background-color: rgba(255, 255, 255, 0.39);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      color: #222;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .producto button {
+      margin: 5px 10px 0 0;
+      padding: 6px 14px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: rgb(255, 255, 255);
+      transition: background-color 0.3s ease;
+    }
+
+    .producto button:first-of-type {
+      background-color: #28a745;
+    }
+
+    .producto button:first-of-type:hover {
+      background-color: #218838;
+    }
+
+    .producto button:last-of-type {
+      background-color: #dc3545;
+    }
+
+    .producto button:last-of-type:hover {
+      background-color: #c82333;
+    }
+
+    #productos {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: left;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Clientes</a>
+      <a href="indexpro.html">Proveedores</a>
+      <a href="indextcat.html">Categorías</a>
+      <a href="detalle_venta.html">Detalle_venta</a>
+      <a href="menu_admin.php">volver</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div id="alerta" class="alerta"></div>
+    <h1>Gestión de Productos</h1>
+    <form id="formProducto">
+      <input type="hidden" id="id_producto">
+      <input type="text" id="descripcion" placeholder="Descripción" required>
+      <input type="number" step="0.01" id="precio" placeholder="Precio" required>
+      <input type="number" id="stock" placeholder="Stock" required>
+      <select id="id_categoria" required>
+        <option value="">Selecciona Categoría</option>
+      </select>
+      <select id="id_proveedor" required>
+        <option value="">Selecciona Proveedor</option>
+      </select>
+      <button type="submit">Guardar</button>
+    </form>
+  </div>
+  <div class="container">
+    <h3>Lista de Productos</h3>
+    <div id="productos"></div>
+  </div>
+
+  <script>
+    // Función para mostrar alertas
+    function mostrarAlerta(mensaje, tipo) {
+      const alerta = document.getElementById('alerta');
+      alerta.textContent = mensaje;
+      alerta.className = `alerta ${tipo}`;
+      alerta.style.display = 'block';
+      
+      setTimeout(() => {
+        alerta.style.display = 'none';
+      }, 3000);
+    }
+
+    // Cargar productos
+    async function cargarProductos() {
+      try {
+        const res = await fetch('listarproducto.php');
+        const productos = await res.json();
+        const contenedor = document.getElementById('productos');
+        contenedor.innerHTML = '';
+        
+        if (productos.length === 0) {
+          contenedor.innerHTML = '<p>No hay productos registrados</p>';
+          return;
+        }
+
+        productos.forEach(p => {
+          contenedor.innerHTML += `
+            <div class="producto">
+              <strong>${p.descripcion}</strong><br>
+              Precio: $${p.precio} | Stock: ${p.stock}<br>
+              Categoría: ${p.categoria || 'N/A'}<br>
+              Proveedor: ${p.proveedor || 'N/A'}<br>
+              <button onclick="editarProducto(${p.id_producto})">Editar</button>
+              <button onclick="eliminarProducto(${p.id_producto})">Eliminar</button>
+            </div>`;
+        });
+      } catch (error) {
+        mostrarAlerta('Error al cargar productos', 'error');
+        console.error('Error:', error);
+      }
+    }
+
+    // Cargar categorías
+    async function cargarCategorias() {
+      try {
+        const res = await fetch('listarcat.php');
+        const categorias = await res.json();
+        const select = document.getElementById('id_categoria');
+        select.innerHTML = '<option value="">Selecciona Categoría</option>';
+        
+        categorias.forEach(c => {
+          select.innerHTML += `<option value="${c.id_categoria}">${c.descripcion}</option>`;
+        });
+      } catch (error) {
+        mostrarAlerta('Error al cargar categorías', 'error');
+        console.error('Error:', error);
+      }
+    }
+
+    // Cargar proveedores
+    async function cargarProveedores() {
+      try {
+        const res = await fetch('listarpro.php');
+        const proveedores = await res.json();
+        const select = document.getElementById('id_proveedor');
+        select.innerHTML = '<option value="">Selecciona Proveedor</option>';
+        
+        proveedores.forEach(p => {
+          select.innerHTML += `<option value="${p.id_proveedor}">${p.razonsocial}</option>`;
+        });
+      } catch (error) {
+        mostrarAlerta('Error al cargar proveedores', 'error');
+        console.error('Error:', error);
+      }
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('formProducto').addEventListener('submit', async e => {
+      e.preventDefault();
+      
+      // Validación básica
+      const descripcion = document.getElementById('descripcion').value;
+      if (!descripcion) {
+        mostrarAlerta('La descripción es requerida', 'error');
+        return;
+      }
+
+      const id = document.getElementById('id_producto').value;
+      const precio = parseFloat(document.getElementById('precio').value);
+      const stock = parseInt(document.getElementById('stock').value);
+      const id_categoria = parseInt(document.getElementById('id_categoria').value);
+      const id_proveedor = parseInt(document.getElementById('id_proveedor').value);
+
+      // Validación adicional
+      if (isNaN(precio)){
+        mostrarAlerta('El precio debe ser un número válido', 'error');
+        return;
+      }
+
+      if (isNaN(stock)) {
+        mostrarAlerta('El stock debe ser un número válido', 'error');
+        return;
+      }
+
+      const datos = new FormData();
+      datos.append('descripcion', descripcion);
+      datos.append('precio', precio);
+      datos.append('stock', stock);
+      datos.append('id_categoria', id_categoria);
+      datos.append('id_proveedor', id_proveedor);
+
+      let url = 'crearproducto.php';
+      if (id) {
+        datos.append('id_producto', id);
+        url = 'actualizarproducto.php';
+      }
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          body: datos
+        });
+
+        const texto = await res.text();
+        
+        if (res.ok) {
+          mostrarAlerta(texto, 'success');
+          cargarProductos();
+          document.getElementById('formProducto').reset();
+          document.getElementById('id_producto').value = '';
+        } else {
+          mostrarAlerta(texto, 'error');
+        }
+      } catch (error) {
+        mostrarAlerta('Error de conexión', 'error');
+        console.error('Error:', error);
+      }
+    });
+
+    // Editar producto
+    async function editarProducto(id) {
+      try {
+        const res = await fetch('obtenerproducto.php?id=' + id);
+        const producto = await res.json();
+        
+        if (producto.error) {
+          mostrarAlerta(producto.error, 'error');
+          return;
+        }
+
+        document.getElementById('id_producto').value = producto.id_producto;
+        document.getElementById('descripcion').value = producto.descripcion;
+        document.getElementById('precio').value = producto.precio;
+        document.getElementById('stock').value = producto.stock;
+        document.getElementById('id_categoria').value = producto.id_categoria;
+        document.getElementById('id_proveedor').value = producto.id_proveedor;
+        
+        // Desplazar la vista al formulario
+        document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+      } catch (error) {
+        mostrarAlerta('Error al cargar producto', 'error');
+        console.error('Error:', error);
+      }
+    }
+
+    // Eliminar producto
+    async function eliminarProducto(id) {
+      if (!confirm('¿Estás seguro de eliminar este producto?')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('eliminarproducto.php?id=' + id);
+        const texto = await res.text();
+        
+        if (res.ok) {
+          mostrarAlerta(texto, 'success');
+          cargarProductos();
+        } else {
+          mostrarAlerta(texto, 'error');
+        }
+      } catch (error) {
+        mostrarAlerta('Error al eliminar producto', 'error');
+        console.error('Error:', error);
+      }
+    }
+
+    // Cargar datos al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarCategorias();
+      cargarProveedores();
+      cargarProductos();
+    });
+  </script>
+</body>
+</html>
